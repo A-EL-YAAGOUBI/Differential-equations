@@ -293,11 +293,27 @@ def update_phi(f, c1, c2, phi, dt=0.5, nu = 0, lambda1 = 1 ,lambda2 = 1):
 
 
 def chan_vese(f, ITER_MAX=20, tol=1e-1):
+    """Chan-Vese segmentation method.
+
+    Parameters
+    ----------
+    f : np.array
+        Image tp be segmented.
+    ITER_MAX : int
+        Maximum number of iterations.
+    tol : float
+        Stoping parameter.
+
+    Returns
+    -------
+    list(np.array)
+        Successive values of U accross iterations.
+    """
+
     print('Chan-Vese method :')
     images = []
     phi      = init_phi(f)
     last_phi = phi.copy() + 1
-
     phis = [phi]
     i = 0
     while i < ITER_MAX and np.linalg.norm(last_phi - phi) > tol:
