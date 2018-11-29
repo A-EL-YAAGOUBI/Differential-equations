@@ -4,6 +4,7 @@
 # Victor Le Maistre
 # Simon Delecourt
 
+
 def square(x):
     """Squares the number x.
 
@@ -46,13 +47,13 @@ def nablaPlus(x_n, i, j, axis=0):
         if j == x_n.shape[1]-1:
             return 0
         else:
-            return (x_n[i,j+1] - x_n[i,j])/2
+            return (x_n[i, j+1] - x_n[i, j])/2
 
     if axis == 1:
         if i == x_n.shape[0]-1:
             return 0
         else:
-            return (x_n[i+1,j] - x_n[i,j])/2
+            return (x_n[i+1, j] - x_n[i, j])/2
 
 
 def nablaMinus(x_n, i, j, axis=0):
@@ -80,13 +81,13 @@ def nablaMinus(x_n, i, j, axis=0):
         if j == 0:
             return 0
         else:
-            return (x_n[i,j-1] - x_n[i,j])/2
+            return (x_n[i, j-1] - x_n[i, j])/2
 
     if axis == 1:
         if i == 0:
             return 0
         else:
-            return (x_n[i-1,j] - x_n[i,j])/2
+            return (x_n[i-1, j] - x_n[i, j])/2
 
 
 def getPhi(phi, i, j):
@@ -107,10 +108,10 @@ def getPhi(phi, i, j):
         Value of phi at position (i, j).
     """
 
-    return phi[min(max(i,0),phi.shape[0]-1),min(max(j,0),phi.shape[1]-1)]
+    return phi[min(max(i, 0), phi.shape[0] - 1), min(max(j, 0), phi.shape[1] - 1)]
 
 
-def nablaZero(x_n, i, j,axis=0):
+def nablaZero(x_n, i, j, axis=0):
     """Computes centered derivative at position (i, j).
 
     Parameters
@@ -131,6 +132,7 @@ def nablaZero(x_n, i, j,axis=0):
     """
 
     return (nablaPlus(x_n, i, j, axis) + nablaMinus(x_n, i, j, axis)) / 2
+
 
 def A(phi, i, j, mu=0.2, eta=1e-8):
     """Added notation to simplify computations and to structure the code
@@ -155,6 +157,7 @@ def A(phi, i, j, mu=0.2, eta=1e-8):
         value of A at position (i, j).
     """
 
+    import numpy as np
     return mu / np.sqrt(square(eta) + square(nablaPlus(phi, i, j, axis=1)) + square(nablaZero(phi, i, j, axis=0)))
 
 
@@ -181,10 +184,11 @@ def B(phi, i, j, mu=0.2, eta=1e-8):
         value of B at position (i, j).
     """
 
+    import numpy as np
     return mu / np.sqrt(square(eta) + square(nablaPlus(phi, i, j, axis=0)) + square(nablaZero(phi, i, j, axis=1)))
 
 
-def deltaRegularized(x,epsilon=1):
+def deltaRegularized(x, epsilon=1):
     """Derivative of the Heaviside function, i-e Dirac Mass.
 
     Parameters
@@ -200,6 +204,7 @@ def deltaRegularized(x,epsilon=1):
         Value of the regularized Dirac Mass.
     """
 
+    import math
     return epsilon / (math.pi*(square(epsilon) + square(x)))
 
 
@@ -217,14 +222,16 @@ def initPhi(x):
         Initial Phi as Checkboard function.
     """
 
+    import math
+    import numpy as np
     res = np.zeros(x.shape)
     for i in range(x.shape[0]):
         for j in range(x.shape[1]):
-            res[i,j] = math.sin(math.pi/5 * i)*math.sin(math.pi/5 * j)
+            res[i, j] = math.sin(math.pi/5 * i)*math.sin(math.pi/5 * j)
     return res
 
 
-def u(img,phi):
+def u(img, phi):
     """Computes U from Phi.
 
     Parameters
@@ -240,16 +247,17 @@ def u(img,phi):
         Piecewise constant funciton U.
     """
 
+    import numpy as np
     c1 = np.mean(img[phi > 0])
     c2 = np.mean(img[phi <= 0])
 
     res = np.zeros(img.shape)
     res[phi > 0] = c1
     res[phi <= 0] = c2
-    return c1,c2, res
+    return c1, c2, res
 
 
-def updatePhi(f, c1, c2, phi, dt=0.5, nu = 0, lambda1 = 1 ,lambda2 = 1):
+def updatePhi(f, c1, c2, phi, dt=0.5, nu=0, lambda1=1, lambda2=1):
     """Update step that realizes the chanvese method.
 
     Parameters
@@ -279,9 +287,9 @@ def updatePhi(f, c1, c2, phi, dt=0.5, nu = 0, lambda1 = 1 ,lambda2 = 1):
 
     for i in range(phi.shape[0]):
         for j in range(phi.shape[1]):
-            numerator = getPhi(phi,i,j) + dt * deltaRegularized(getPhi(phi,i,j)) * (A(phi,i,j) * getPhi(phi,i-1,j) + B(phi,i,j) * getPhi(phi,i,j+1) + B(phi,i,j-1) * getPhi(phi,i,j-1) - nu - lambda1 * square(f[i,j] - c1) + lambda2 * square(f[i,j] - c2))
-            denominator = 1 + dt*deltaRegularized(getPhi(phi,i,j))*(A(phi,i,j) + A(phi,i-1,j) + B(phi,i,j) + B(phi,i,j-1))
-            phi[i,j] = numerator / denominator
+            numerator = getPhi(phi, i, j) + dt * deltaRegularized(getPhi(phi, i, j)) * (A(phi, i, j) * getPhi(phi, i - 1, j) + B(phi, i, j) * getPhi(phi, i, j + 1) + B(phi, i, j - 1) * getPhi(phi, i, j - 1) - nu - lambda1 * square(f[i, j] - c1) + lambda2 * square(f[i, j] - c2))
+            denominator = 1 + dt*deltaRegularized(getPhi(phi, i, j))*(A(phi, i, j) + A(phi, i - 1, j) + B(phi, i, j) + B(phi, i, j - 1))
+            phi[i, j] = numerator / denominator
     return phi
 
 
@@ -303,6 +311,7 @@ def computeChanVase(f, ITER_MAX=20, tol=1e-1):
         Successive values of U accross iterations.
     """
 
+    import numpy as np
     print('Chan-Vese method :')
     images = []
     phi      = initPhi(f)
@@ -313,9 +322,11 @@ def computeChanVase(f, ITER_MAX=20, tol=1e-1):
         i += 1
         if i % 5 == 0:
             print('Iteration {}'.format(i))
-        c1, c2, img = u(f,phi)
+        c1, c2, img = u(f, phi)
         images.append(img)
         last_phi = np.copy(phi)
         phi = updatePhi(f, c1, c2, phi)
         phis.append(phi)
-    return images #return i,images,phis
+
+    # return i, images, phis
+    return images
