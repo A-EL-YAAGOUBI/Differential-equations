@@ -256,14 +256,41 @@ def u(img,phi):
     return c1,c2, res
 
 
-def update_phi(f, c1, c2, phi, dt=0.5, nu = 0, lambda1 = 1 ,lambda2 = 1): #Tout le travail est là
+def update_phi(f, c1, c2, phi, dt=0.5, nu = 0, lambda1 = 1 ,lambda2 = 1):
+    """Update step that realizes the chan_vese method.
+
+    Parameters
+    ----------
+    f : np.array
+        Image tp be segmented.
+    c1 : float
+        average value of phi inside the contour (i-e first value of U).
+    c2 : float
+        average value of phi outside the contour (i-e second value of U).
+    phi : np.array
+        Function Phi to be updated.
+    dt : float
+        Time step subdivision.
+    nu : float
+        Length penalization parameter.
+    lambda1 : float
+        Penalization parameter for approximation error inside the contour.
+    lambda2 : float
+        Penalization parameter for approximation error outside the contour.
+
+    Returns
+    -------
+    np.array
+        New Phi.
+    """
+
     for i in range(phi.shape[0]):
         for j in range(phi.shape[1]):
             numerator = get_phi(phi,i,j) + dt * delta_regularized(get_phi(phi,i,j)) * (A(phi,i,j) * get_phi(phi,i-1,j) + B(phi,i,j) * get_phi(phi,i,j+1) + B(phi,i,j-1) * get_phi(phi,i,j-1) - nu - lambda1 * square(f[i,j] - c1) + lambda2 * square(f[i,j] - c2))
             denominator = 1 + dt*delta_regularized(get_phi(phi,i,j))*(A(phi,i,j) + A(phi,i-1,j) + B(phi,i,j) + B(phi,i,j-1))
             phi[i,j] = numerator / denominator
-
     return phi
+
 
 def chan_vese(f, ITER_MAX=20, tol=1e-1):
     print('Chan-Vese method :')
