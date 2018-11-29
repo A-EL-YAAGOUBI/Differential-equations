@@ -12,11 +12,42 @@ Tumor detection using Active Contour :
 
 
 def square(x):
+    """Squares the number x.
+
+    Parameters
+    ----------
+    x : float
+        Number to be squared.
+
+    Returns
+    -------
+    float
+        Square of x.
+    """
 
     return x*x
 
 
 def nabla_plus(x_n, i, j, axis=0):
+    """Computes the forward derivative.
+
+    Parameters
+    ----------
+    x_n : np.array
+        Surface to be differentiated.
+    i : int
+        Y position.
+    j : int
+        X position.
+    axis : int
+        Dimension to be differentiated (default axis=0).
+
+    Returns
+    -------
+    float
+        Derivative of x_n at position (i, j).
+
+    """
 
     if axis == 0:
         if j == x_n.shape[1]-1:
@@ -32,6 +63,25 @@ def nabla_plus(x_n, i, j, axis=0):
 
 
 def nabla_minus(x_n, i, j, axis=0):
+    """Computes the backward derivative.
+
+    Parameters
+    ----------
+    x_n : np.array
+        Surface to be differentiated.
+    i : int
+        Y position.
+    j : int
+        X position.
+    axis : int
+        Dimension to be differentiated (default axis=0).
+
+    Returns
+    -------
+    float
+        Derivative of x_n at position (i, j).
+
+    """
 
     if axis == 0:
         if j == 0:
@@ -47,6 +97,22 @@ def nabla_minus(x_n, i, j, axis=0):
 
 
 def get_phi(phi, i, j):
+    """Gets value of phi at position (i, j), and avoids getting outside of the domaine.
+
+    Parameters
+    ----------
+    phi : np.array
+        phi matrix.
+    i : int
+        Position of Y.
+    j : int
+        Position of X.
+
+    Returns
+    -------
+    float
+        Value of phi at position (i, j).
+    """
 
     return phi[min(max(i,0),phi.shape[0]-1),min(max(j,0),phi.shape[1]-1)]
 
