@@ -118,24 +118,111 @@ def get_phi(phi, i, j):
 
 
 def nabla_zero(x_n, i, j,axis=0):
+    """Computes centered derivative at position (i, j).
+
+    Parameters
+    ----------
+    x_n : np.array
+        Surface to be differentiated.
+    i : int
+        Y position.
+    j : int
+        X position.
+    axis : int
+        Dimension to be differentiated (default axis=0).
+
+    Returns
+    -------
+    float
+        Centered derivative of x_n at position (i, j).
+    """
+
     return (nabla_plus(x_n, i, j, axis) + nabla_minus(x_n, i, j, axis)) / 2
 
 def A(phi, i, j, mu=0.2, eta=1e-8):
+    """Added notation to simplify computations and to structure the code
+    see : http://www.ipol.im/pub/art/2012/g-cv/article.pdf.
+
+    Parameters
+    ----------
+    phi : np.array
+        2D function (from R² to R).
+    i : int
+        Y position.
+    j : int
+        X position.
+    mu : float
+        Length penalization parameter.
+    eta : float
+        Regularization parameter for the curvature (avoids division by zero).
+
+    Returns
+    -------
+    float
+        value of A at position (i, j).
+    """
 
     return mu / np.sqrt(square(eta) + square(nabla_plus(phi, i, j, axis=1)) + square(nabla_zero(phi, i, j, axis=0)))
 
 
 def B(phi, i, j, mu=0.2, eta=1e-8):
+    """Added notation to simplify computations and to structure the code
+    see : http://www.ipol.im/pub/art/2012/g-cv/article.pdf.
+
+    Parameters
+    ----------
+    phi : np.array
+        2D function (from R² to R).
+    i : int
+        Y position.
+    j : int
+        X position.
+    mu : float
+        Length penalization parameter.
+    eta : float
+        Regularization parameter for the curvature (avoids division by zero).
+
+    Returns
+    -------
+    float
+        value of B at position (i, j).
+    """
 
     return mu / np.sqrt(square(eta) + square(nabla_plus(phi, i, j, axis=0)) + square(nabla_zero(phi, i, j, axis=1)))
 
 
 def delta_regularized(x,epsilon=1):
+    """Derivative of the Heaviside function, i-e Dirac Mass.
+
+    Parameters
+    ----------
+    x : float
+        Position x.
+    epsilon : float
+        Regularizer of the Dirac Mass.
+
+    Returns
+    -------
+    float
+        Value of the regularized Dirac Mass.
+    """
 
     return epsilon / (math.pi*(square(epsilon) + square(x)))
 
 
 def init_phi(x):
+    """initialization of phi.
+
+    Parameters
+    ----------
+    x : np.array
+        Matrix of the size of phi.
+
+    Returns
+    -------
+    np.array
+        Initial Phi as Checkboard function.
+    """
 
     res = np.zeros(x.shape)
     for i in range(x.shape[0]):
@@ -145,6 +232,20 @@ def init_phi(x):
 
 
 def u(img,phi):
+    """Computes U from Phi.
+
+    Parameters
+    ----------
+    img : np.array
+        image.
+    phi : np.array
+        function phi.
+
+    Returns
+    -------
+    np.array
+        Piecewise constant funciton U.
+    """
 
     c1 = np.mean(img[phi > 0])
     c2 = np.mean(img[phi <= 0])
